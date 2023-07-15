@@ -1,40 +1,48 @@
 <?php
 
 namespace App\Http\Controllers;
-
+// use App\Notifications\MailResetPasswordNotification;
 use Illuminate\Http\Request;
-// use Illuminate\Mail\Message;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Routing\UrlGenerator;
-
+// use Illuminate\Support\Facades\Password;
+use App\Notifications\ResetPasswordCodeNotification;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 
 class ForgotPasswordController extends Controller
 {
-     /**
-     * Send a password reset link to the given user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+   
+  
     public function reset(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|email|exists:users,email',
         ]);
+    
+        $code = rand(100000, 999999);
+    
+        $userEmail = $request->input('email');
+    
+        // Save the code to the user's record in the database if needed
+        // You can store it in a separate column, or simply send it via email without saving it
+          // Save the code to the user's record in the database
+          DB::table('users')
+          ->where('email', $userEmail)
+          ->update(['code' => $code]);
 
-        $status = Password::sendResetLink($request->only('email'));
-
-        return response()->json(['status' => $status]);
-        
+    
+        // Send the notification email
+        Notification::route('mail', $userEmail)->notify(new ResetPasswordCodeNotification($code));
+    
+        return response()->json(['message' => 'Code sent.', 'code' => $code]);
     }
-
-
+    }
     
 
     
 
-}
+    
+
 
 
 

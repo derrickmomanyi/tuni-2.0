@@ -39,7 +39,7 @@ import axios from 'axios'
             forgotPassword(){
                 axios.post('http://127.0.0.1:8000/api/forgot_password', this.formData).then((response) => {
                     console.log(response);                                     
-                             
+                    this.$router.push('/reset_password')          
                   
                 }).catch((errors) => {
                     this.errors = errors.response.data.errors
