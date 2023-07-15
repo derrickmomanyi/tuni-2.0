@@ -16,10 +16,10 @@
               <a href="#" class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ml-10">Add Pet</a>
               <a href="#" class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ml-10">Services</a> -->
               <router-link to="/addgame" class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ">Add Game</router-link>
-              <router-link to="/register"  class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ">Register</router-link>
-              <router-link to="/login"  class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ">Login</router-link>
+              <router-link   v-if="!isLoggedIn" to="/register" class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ">Register</router-link>
+              <router-link to="/login" v-if="!isLoggedIn" class="text-blue-600 hover:bg-blue-600 hover:text-white rounded-md px-3 py-2 text-sm font-medium ">Login</router-link>
               
-              <button @click="logout" v-if="token" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button @click="logout" v-if="isLoggedIn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Logout
             </button>
             </div>
@@ -40,12 +40,16 @@ export default {
   
   data(){
     return{
-      
+      isLoggedIn: false,
       currentUser: {},
       token: localStorage.getItem('token')     
     }
   },
   mounted(){
+    const token = localStorage.getItem('token');
+    if (token) {
+    // If token is present, set isLoggedIn to true
+    this.isLoggedIn = true;
     window.axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`    
     axios.get('http://127.0.0.1:8000/api/user').then((response) => {
         this.currentUser = response.data
@@ -53,13 +57,20 @@ export default {
     }).catch((errors) => {
         console.log(errors)
     })
+    }
+    else{
+      // If token is not present, set isLoggedIn to false
+    this.isLoggedIn = false;
+    }
+    
     
   console.log('Token:', this.token);
   },
   methods: {  
       logout(){
           axios.post('http://127.0.0.1:8000/api/logout').then((response) => {
-              localStorage.removeItem('token')              
+              localStorage.removeItem('token')   
+              this.isLoggedIn = false;           
               this.$router.push('/login')
               
           }).catch((errors) => {

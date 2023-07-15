@@ -13,7 +13,7 @@ class ResetPasswordController extends Controller
         $request->validate([
             'email' => 'required',
             'code' => 'required',
-            'password' => 'required|confirmed|min:8',
+            'password' => 'required|confirmed|min:2',
         ]);
        
          // Fetch the user by their email address

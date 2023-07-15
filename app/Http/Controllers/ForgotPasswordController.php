@@ -22,7 +22,7 @@ class ForgotPasswordController extends Controller
         $code = rand(100000, 999999);
     
         $userEmail = $request->input('email');
-    
+         
         // Save the code to the user's record in the database if needed
         // You can store it in a separate column, or simply send it via email without saving it
           // Save the code to the user's record in the database
